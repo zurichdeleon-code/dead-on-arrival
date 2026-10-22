@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dead on Arrival</title>
+<style>[hidden]{display:none !important}</style>
+<style>
+  /* Layout: one white case-file card on a cream/black diagonal checkerboard, phone-first.
+     Single deliberate look (matches the printed Detectives packet), so no dark variant. */
+  :root {
+    --red: #e8192c;
+    --red-dark: #b80f1f;
+    --ink: #111111;
+    --body: #2b2b2b;
+    --muted: #6e6e6e;
+    --kicker: #6b5a4e;
+    --cream: #f3ebdc;
+    --paper: #ffffff;
+    --rule: #9a9a9a;
+    --footer: #555555;
+    --serif: Georgia, "Times New Roman", Times, serif;
+    --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23f3ebdc'/%3E%3Crect width='18' height='18' fill='%23111'/%3E%3Crect x='18' y='18' width='18' height='18' fill='%23111'/%3E%3Cpath d='M1 1L17 17M19 19L35 35' stroke='%23f3ebdc' stroke-width='1.6' opacity='.55'/%3E%3Cpath d='M0 0L18 18H0z' fill='%23262626'/%3E%3Cpath d='M18 18L36 36H18z' fill='%23262626'/%3E%3C/svg%3E");
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; background: var(--cream); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--cream) var(--check) repeat;
+    background-size: 36px 36px;
+    color: var(--body);
+    font-family: var(--serif);
+    padding-block: 16px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .card {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: calc(100dvh - 32px);
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 28px;
+    padding: 34px 24px 22px;
+    display: flex;
+    flex-direction: column;
+  }
+  .kicker {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--kicker);
+    text-align: center;
+    margin: 0 0 14px;
+  }
+  .headline {
+    font-family: var(--serif);
+    font-weight: 700;
+    color: var(--red);
+    text-align: center;
+    font-size: clamp(40px, 13vw, 64px);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .headline.xl { font-size: clamp(50px, 16vw, 84px); text-transform: uppercase; }
+  .subtitle {
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.35;
+    text-align: center;
+    color: var(--body);
+    margin: 0 0 18px;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .red-rule { border: 0; border-top: 3px solid var(--red); margin: 0 0 22px; }
+  .label {
+    font-family: var(--sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--red);
+    font-size: 15px;
+    line-height: 1.3;
+    margin: 24px 0 8px;
+  }
+  .label:first-of-type { margin-top: 2px; }
+  p { font-size: 18px; line-height: 1.5; margin: 0 0 10px; }
+  .grow { flex: 1; }
+  .footer {
+    border-top: 1px solid var(--rule);
+    margin-top: 28px;
+    padding-top: 14px;
+    text-align: center;
+    font-style: italic;
+    color: var(--footer);
+    font-size: 16px;
+  }
+
+  /* Buttons: pill, red outline, uppercase sans */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 54px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: 2.5px solid var(--red);
+    background: var(--paper);
+    color: var(--red);
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.15s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: var(--red); color: var(--paper); }
+  .btn.primary:hover { background: var(--red-dark); border-color: var(--red-dark); }
+  .btn.ink { border-color: var(--ink); color: var(--ink); }
+  .btn.big { min-height: 66px; font-size: 17px; letter-spacing: 0.08em; }
+  .btn[disabled] { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn.primary[disabled]:hover { background: var(--red); border-color: var(--red); }
+  .linkish {
+    background: none; border: 0; padding: 6px; color: var(--muted);
+    font-family: var(--serif); font-style: italic; font-size: 15px; text-decoration: underline;
+    cursor: pointer;
+  }
+  .stack { display: grid; gap: 12px; }
+  .accuse { margin-top: 28px; display: grid; gap: 10px; }
+  .note { font-size: 15px; font-style: italic; color: var(--muted); text-align: center; margin: 0; }
+  .switch { text-align: center; margin-top: 10px; }
+  .confirm {
+    margin-top: 6px;
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 14px 16px;
+    background: var(--paper);
+    display: grid;
+    gap: 10px;
+    text-align: center;
+  }
+  .confirm p { font-size: 16px; margin: 0; }
+  .confirm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .confirm-row .btn { min-height: 44px; font-size: 12px; padding: 8px 12px; }
+
+  /* Form */
+  .field { margin: 6px 0 14px; }
+  .field label {
+    display: block;
+    font-family: var(--sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--red);
+    font-size: 14px;
+    margin: 0 0 6px;
+  }
+  input[type="text"] {
+    width: 100%;
+    font: 18px/1.4 var(--serif);
+    color: var(--ink);
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .error {
+    color: var(--red-dark);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    min-height: 1.2em;
+    margin: 6px 0 0;
+  }
+  .lede { text-align: center; color: var(--body); }
+  input:focus, .btn:focus-visible, .linkish:focus-visible {
+    outline: 3px solid rgba(232, 25, 44, 0.35);
+    outline-offset: 2px;
+  }
+  @media (min-width: 700px) {
+    body { padding-block: 28px; }
+    .card { min-height: calc(100dvh - 56px); padding: 44px 40px 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. Join -->
+<main class="card" id="view-join" aria-labelledby="join-title">
+  <p class="kicker">Rho presents</p>
+  <h1 class="headline xl" id="join-title">Dead on Arrival</h1>
+  <hr class="red-rule">
+  <p class="subtitle">A 5-minute-to-learn murder mystery for Onieal’s</p>
+  <form id="join-form" novalidate>
+    <div class="field">
+      <label for="detective-name">Your name, detective</label>
+      <input type="text" id="detective-name" name="detective-name" autocomplete="given-name" maxlength="40" placeholder="First name is fine" required>
+      <p class="error" id="join-error" role="alert"></p>
+    </div>
+    <button type="submit" class="btn primary big" id="join-submit">Get my detective card</button>
+  </form>
+  <div class="grow"></div>
+  <div class="footer">Observe · Interrogate · Accuse</div>
+</main>
+
+<!-- 2. Detective card -->
+<main class="card" id="view-card" hidden aria-labelledby="card-title">
+  <p class="kicker">Rho presents / Dead on Arrival</p>
+  <h1 class="headline" id="card-title">DETECTIVE</h1>
+  <p class="subtitle" id="card-sub">Detective · Variant A · Investigative dossier</p>
+  <hr class="red-rule">
+
+  <h2 class="label">The case</h2>
+  <p>Jordan Walsh, CEO of Nimbus Pay, collapsed tonight minutes after drinking a bottle of “Nimbus Nectar.” Paramedics suspect a cardiac event, not a panic attack.</p>
+
+  <h2 class="label">Your job</h2>
+  <p>Ask the six suspects anything you want. Each one has a trigger question they must answer truthfully if you ask it exactly — but nobody hands you the exact words. Find it yourself. Every man for himself tonight: nobody owes you their clues, and you don’t owe anyone yours. Submit your accusation by the hour mark.</p>
+
+  <h2 class="label">Your starter topic</h2>
+  <p id="card-topic"></p>
+
+  <h2 class="label">To win</h2>
+  <p>Your accusation needs three things: the killer, the motive, and your proof. A name alone won’t cut it.</p>
+
+  <div class="accuse">
+    <a class="btn primary big" id="accuse-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Make my accusation</a>
+    <button type="button" class="btn primary big" id="accuse-wait" disabled>Accusations open soon</button>
+    <p class="note">Lock it in once — first correct answers pick their prizes first.</p>
+  </div>
+
+  <div class="stack" style="margin-top:16px">
+    <button type="button" class="btn ink" id="open-story">Missed the story? Read the case file</button>
+  </div>
+
+  <div class="grow"></div>
+  <div class="footer">Observe · Interrogate · Accuse</div>
+  <div class="switch">
+    <button type="button" class="linkish" id="switch-ask">Not you? Switch detective</button>
+    <div class="confirm" id="switch-confirm" hidden>
+      <p>Clear this card and start over? You may get a different starter topic.</p>
+      <div class="confirm-row">
+        <button type="button" class="btn ink" id="switch-cancel">Keep my card</button>
+        <button type="button" class="btn primary" id="switch-yes">Switch</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 3. Victim story -->
+<main class="card" id="view-story" hidden aria-labelledby="story-title">
+  <p class="kicker">The case file</p>
+  <h1 class="headline" id="story-title">The victim story</h1>
+  <hr class="red-rule">
+  <p>Nimbus Pay just closed a $40M round, and the whole team is celebrating at Onieal’s. Mid-toast, CEO Jordan Walsh drinks a bottle of “Nimbus Nectar” — the company’s new wellness-marketing stunt — hand-delivered by the Head of Growth minutes earlier.</p>
+  <p>Twenty minutes later, Jordan collapses. Paramedics mention a cardiac event, not a panic attack. The six people closest to him tonight are all still in the room. You have one hour.</p>
+
+  <h2 class="label">The suspects</h2>
+  <p>The CTO, The VC, The Rival, The Growth Hacker, The Chief of Staff, The Engineer.</p>
+
+  <h2 class="label">One rule for everyone, suspects included</h2>
+  <p>It’s every man for himself tonight.</p>
+  <p>Nobody — detective or suspect — owes anyone else their information. Whatever you’ve figured out, you keep to yourself. If you want the prize, you solve it on your own.</p>
+
+  <div class="stack" style="margin-top:24px">
+    <button type="button" class="btn ink" id="story-back">Back to my card</button>
+  </div>
+  <div class="grow"></div>
+  <div class="footer">Observe · Interrogate · Accuse</div>
+</main>
+
+<script>
+  // Host: paste the Google Form link between the quotes, then republish.
+  const ACCUSATION_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdPT_SebXm7vW0e6BEPV-7_IlhvtkMxyhV1DMvURJDlDtJY4Q/viewform";
+
+  (function () {
+    var STORE_KEY = "doa-detective";
+    var VARIANTS = {
+      A: "Ask The CTO about setting up tonight’s toast.",
+      B: "Ask The VC about the new term sheet.",
+      C: "Ask The Rival about her meeting with Jake.",
+      D: "Ask The Growth Hacker about tonight’s big launch.",
+      E: "Ask The Chief of Staff about Jordan’s week.",
+      F: "Ask The Engineer about last week’s argument."
+    };
+    var KEYS = Object.keys(VARIANTS);
+    var $ = function (id) { return document.getElementById(id); };
+    var views = { join: $("view-join"), card: $("view-card"), story: $("view-story") };
+    var current = null; // { name, variant } held in memory even if storage is blocked
+
+    function load() {
+      try {
+        var raw = localStorage.getItem(STORE_KEY);
+        if (!raw) return null;
+        var d = JSON.parse(raw);
+        if (d && typeof d.name === "string" && d.name.trim() && VARIANTS[d.variant]) return d;
+      } catch (e) {}
+      return null;
+    }
+    function save(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {} }
+    function clear() { try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+
+    function pickVariant() {
+      var i;
+      try {
+        var a = new Uint32Array(1);
+        crypto.getRandomValues(a);
+        i = a[0] % KEYS.length;
+      } catch (e) {
+        i = Math.floor(Math.random() * KEYS.length);
+      }
+      return KEYS[i];
+    }
+
+    function show(name) {
+      Object.keys(views).forEach(function (k) { views[k].hidden = k !== name; });
+      window.scrollTo(0, 0);
+    }
+
+    function renderCard() {
+      // Non-breaking spaces keep "Variant X" and "Investigative dossier" whole when the line wraps.
+      $("card-sub").textContent = "Detective " + current.name + " · Variant " + current.variant + " · Investigative dossier";
+      $("card-topic").textContent = VARIANTS[current.variant];
+      $("switch-confirm").hidden = true;
+      $("switch-ask").hidden = false;
+      show("card");
+    }
+
+    function setupAccuse() {
+      var url = (ACCUSATION_FORM_URL || "").trim();
+      var ok = /^https:\/\//i.test(url);
+      $("accuse-link").hidden = !ok;
+      $("accuse-wait").hidden = ok;
+      if (ok) $("accuse-link").href = url;
+    }
+
+    $("join-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = $("detective-name").value.replace(/\s+/g, " ").trim();
+      if (!name) {
+        $("join-error").textContent = "Add your name so the host knows whose card this is.";
+        $("detective-name").focus();
+        return;
+      }
+      $("join-error").textContent = "";
+      current = { name: name.slice(0, 40), variant: pickVariant() };
+      save(current);
+      renderCard();
+    });
+
+    $("open-story").addEventListener("click", function () { show("story"); });
+    $("story-back").addEventListener("click", function () { current ? renderCard() : show("join"); });
+
+    $("switch-ask").addEventListener("click", function () {
+      $("switch-ask").hidden = true;
+      $("switch-confirm").hidden = false;
+    });
+    $("switch-cancel").addEventListener("click", function () {
+      $("switch-confirm").hidden = true;
+      $("switch-ask").hidden = false;
+    });
+    $("switch-yes").addEventListener("click", function () {
+      clear();
+      current = null;
+      $("detective-name").value = "";
+      show("join");
+    });
+
+    setupAccuse();
+    current = load();
+    if (current) renderCard(); else show("join");
+  })();
+</script>
+
+</body>
+</html>
