@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dead on Arrival</title>
+<style>
+  /* Layout: one white case-file card on a cream/black diagonal checkerboard, phone-first.
+     Single deliberate look (matches the printed Detectives packet), so no dark variant. */
+  :root {
+    --red: #e8192c;
+    --ink: #111111;
+    --body: #2b2b2b;
+    --kicker: #6b5a4e;
+    --cream: #f3ebdc;
+    --paper: #ffffff;
+    --rule: #9a9a9a;
+    --footer: #555555;
+    --serif: Georgia, "Times New Roman", Times, serif;
+    --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%23f3ebdc'/%3E%3Crect width='18' height='18' fill='%23111'/%3E%3Crect x='18' y='18' width='18' height='18' fill='%23111'/%3E%3Cpath d='M1 1L17 17M19 19L35 35' stroke='%23f3ebdc' stroke-width='1.6' opacity='.55'/%3E%3Cpath d='M0 0L18 18H0z' fill='%23262626'/%3E%3Cpath d='M18 18L36 36H18z' fill='%23262626'/%3E%3C/svg%3E");
+    /* Reveal order: the solution first, then tiers 3rd → 2nd → 1st, claim line and confetti. */
+    --after: 1.7s;
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; background: var(--cream); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--cream) var(--check) repeat;
+    background-size: 36px 36px;
+    color: var(--body);
+    font-family: var(--serif);
+    padding-block: 16px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .card {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: calc(100dvh - 32px);
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 28px;
+    padding: 34px 24px 22px;
+    display: flex;
+    flex-direction: column;
+  }
+  .kicker {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--kicker);
+    text-align: center;
+    margin: 0 0 14px;
+  }
+  .headline {
+    font-family: var(--serif);
+    font-weight: 700;
+    color: var(--red);
+    text-align: center;
+    font-size: clamp(40px, 13vw, 64px);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.35;
+    text-align: center;
+    color: var(--body);
+    margin: 0 0 18px;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .red-rule { border: 0; border-top: 3px solid var(--red); margin: 0 0 22px; }
+  .label {
+    font-family: var(--sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--red);
+    font-size: 15px;
+    line-height: 1.3;
+    margin: 24px 0 8px;
+  }
+  p { font-size: 18px; line-height: 1.5; margin: 0 0 10px; }
+  .grow { flex: 1; }
+  .footer {
+    border-top: 1px solid var(--rule);
+    margin-top: 28px;
+    padding-top: 14px;
+    text-align: center;
+    font-style: italic;
+    color: var(--footer);
+    font-size: 16px;
+  }
+  @media (min-width: 700px) {
+    body { padding-block: 28px; }
+    .card { min-height: calc(100dvh - 56px); padding: 44px 40px 26px; }
+  }
+
+  /* Announcement view */
+  .announce-lede { text-align: center; font-style: italic; color: var(--body); font-size: 17px; }
+  .tiers { display: grid; gap: 0; margin-top: 6px; }
+  .tier { text-align: center; padding: 16px 0 14px; border-bottom: 1px dashed var(--rule); }
+  .tier:last-child { border-bottom: 0; }
+  .tier .label { margin: 0 0 6px; }
+  .tier .prize { font-family: var(--serif); font-weight: 700; color: var(--ink); font-size: 21px; line-height: 1.25; margin: 0 0 6px; text-wrap: balance; }
+  .tier .names { font-family: var(--serif); font-size: 19px; line-height: 1.35; color: var(--body); margin: 0; }
+  .tier.first .prize { font-size: 24px; }
+  .tier { animation: stamp 0.5s cubic-bezier(.2,.9,.3,1.3) both; }
+  .tier.third { animation-delay: calc(var(--after) + 0.35s); }
+  .tier.second { animation-delay: calc(var(--after) + 0.95s); }
+  .tier.first { animation-delay: calc(var(--after) + 1.55s); }
+  @keyframes stamp {
+    0% { opacity: 0; transform: scale(1.35) rotate(-4deg); }
+    70% { opacity: 1; transform: scale(0.97) rotate(0.6deg); }
+    100% { opacity: 1; transform: none; }
+  }
+  .solution {
+    margin: 6px 0 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    padding: 16px 18px 6px;
+    animation: fadein 0.45s ease 0.15s both;
+  }
+  .sol-title { text-align: center; letter-spacing: 0.14em; margin: 0 0 2px; }
+  .sol-item .label { font-size: 14px; margin: 12px 0 4px; }
+  .sol-item p { margin: 0 0 10px; }
+  .sol-item.killer p { font-weight: 700; color: var(--ink); font-size: 21px; line-height: 1.3; }
+  .sol-item { animation: stamp-sm 0.45s cubic-bezier(.2,.9,.3,1.3) both; }
+  .sol-item.killer { animation-delay: 0.45s; }
+  .sol-item.motive { animation-delay: 0.8s; }
+  .sol-item.proof { animation-delay: 1.15s; }
+  @keyframes stamp-sm {
+    0% { opacity: 0; transform: scale(1.06) rotate(-1.5deg); }
+    70% { opacity: 1; transform: scale(0.99) rotate(0.3deg); }
+    100% { opacity: 1; transform: none; }
+  }
+  .claim { text-align: center; font-family: var(--sans); font-weight: 700; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--red); margin: 20px 0 0; animation: fadein 0.5s ease calc(var(--after) + 2.1s) both; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+  .confetti i {
+    position: absolute; top: -16px; left: var(--x);
+    width: 9px; height: 14px; background: var(--c); border-radius: 2px;
+    opacity: 0;
+    animation: fall var(--d, 2.4s) cubic-bezier(.25,.6,.5,1) calc(var(--t, 1.6s) + var(--after)) forwards;
+  }
+  .confetti i:nth-child(3n) { width: 7px; height: 7px; border-radius: 50%; }
+  .confetti i:nth-child(4n) { width: 12px; height: 6px; }
+  @keyframes fall {
+    0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx, 0px), 105vh) rotate(var(--r, 540deg)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .solution, .sol-item, .tier, .claim { animation: none !important; opacity: 1; transform: none; }
+    .confetti { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 0. Winners announcement -->
+<div class="confetti" id="confetti" aria-hidden="true"><i style="--x:1.3%;--c:var(--red);--t:1.68s;--d:2.65s;--dx:-51px;--r:-734deg"></i><i style="--x:5.9%;--c:var(--ink);--t:2.05s;--d:2.21s;--dx:-49px;--r:788deg"></i><i style="--x:7.4%;--c:var(--cream);--t:1.65s;--d:2.42s;--dx:45px;--r:-588deg;outline:1px solid #111"></i><i style="--x:13.2%;--c:var(--red);--t:1.89s;--d:2.06s;--dx:14px;--r:410deg"></i><i style="--x:18.1%;--c:var(--ink);--t:1.62s;--d:2.86s;--dx:-23px;--r:507deg"></i><i style="--x:19.9%;--c:#f3ebdc;--t:1.89s;--d:2.56s;--dx:27px;--r:-465deg;outline:1px solid #111"></i><i style="--x:23.7%;--c:var(--red);--t:1.92s;--d:2.37s;--dx:10px;--r:-421deg"></i><i style="--x:27.4%;--c:var(--ink);--t:1.85s;--d:2.53s;--dx:39px;--r:836deg"></i><i style="--x:30.8%;--c:var(--cream);--t:1.83s;--d:2.3s;--dx:41px;--r:-609deg;outline:1px solid #111"></i><i style="--x:32.3%;--c:var(--red);--t:1.75s;--d:2.5s;--dx:-17px;--r:654deg"></i><i style="--x:38.0%;--c:var(--ink);--t:1.64s;--d:2.51s;--dx:-39px;--r:515deg"></i><i style="--x:42.8%;--c:#f3ebdc;--t:1.81s;--d:2.96s;--dx:-51px;--r:708deg;outline:1px solid #111"></i><i style="--x:45.4%;--c:var(--red);--t:1.9s;--d:2.58s;--dx:-2px;--r:-455deg"></i><i style="--x:50.0%;--c:var(--ink);--t:1.84s;--d:2.66s;--dx:-53px;--r:816deg"></i><i style="--x:50.9%;--c:var(--cream);--t:1.79s;--d:2.67s;--dx:-58px;--r:723deg;outline:1px solid #111"></i><i style="--x:54.0%;--c:var(--red);--t:1.66s;--d:2.06s;--dx:38px;--r:492deg"></i><i style="--x:59.8%;--c:var(--ink);--t:1.8s;--d:2.92s;--dx:3px;--r:-530deg"></i><i style="--x:62.2%;--c:#f3ebdc;--t:1.87s;--d:2.88s;--dx:44px;--r:645deg;outline:1px solid #111"></i><i style="--x:66.8%;--c:var(--red);--t:2.09s;--d:2.68s;--dx:-12px;--r:-514deg"></i><i style="--x:67.9%;--c:var(--ink);--t:1.68s;--d:2.66s;--dx:-59px;--r:546deg"></i><i style="--x:72.2%;--c:var(--cream);--t:1.6s;--d:2.42s;--dx:-13px;--r:488deg;outline:1px solid #111"></i><i style="--x:77.4%;--c:var(--red);--t:1.86s;--d:2.62s;--dx:26px;--r:-827deg"></i><i style="--x:81.8%;--c:var(--ink);--t:1.99s;--d:2.87s;--dx:42px;--r:767deg"></i><i style="--x:83.4%;--c:#f3ebdc;--t:1.65s;--d:2.63s;--dx:-53px;--r:-428deg;outline:1px solid #111"></i><i style="--x:89.3%;--c:var(--red);--t:1.82s;--d:2.11s;--dx:16px;--r:-464deg"></i><i style="--x:88.9%;--c:var(--ink);--t:1.68s;--d:2.1s;--dx:-14px;--r:-432deg"></i><i style="--x:95.9%;--c:var(--cream);--t:1.91s;--d:2.15s;--dx:-28px;--r:732deg;outline:1px solid #111"></i><i style="--x:97.9%;--c:var(--red);--t:1.66s;--d:2.49s;--dx:-1px;--r:855deg"></i></div>
+<main class="card" id="view-announce" aria-labelledby="announce-title">
+  <p class="kicker">Rho presents / Dead on Arrival</p>
+  <h1 class="headline" id="announce-title">Case closed</h1>
+  <p class="subtitle">The detectives who came closest</p>
+  <hr class="red-rule">
+  <p class="announce-lede">Nobody cracked all three, so tonight’s prizes go to the sharpest detectives in the room.</p>
+
+  <section class="solution" aria-labelledby="sol-title">
+    <h2 class="label sol-title" id="sol-title">The solution</h2>
+    <div class="sol-item killer">
+      <h3 class="label">The killer</h3>
+      <p>The Growth Hacker (Tyler).</p>
+    </div>
+    <div class="sol-item motive">
+      <h3 class="label">The motive</h3>
+      <p>He spiked Jordan's "founder optimization" kombucha with a nootropic formula Legal had put on hold, then doubled the dose. He had no idea Jordan was secretly managing a heart condition.</p>
+    </div>
+    <div class="sol-item proof">
+      <h3 class="label">The proof</h3>
+      <p>Tyler's own admission: he doubled the dose because the first batch "didn't do anything."</p>
+    </div>
+  </section>
+
+  <div class="tiers">
+    <section class="tier first" aria-labelledby="tier-1">
+      <h2 class="label" id="tier-1">1st place</h2>
+      <p class="prize">Knicks vs. Nets tickets</p>
+      <p class="names">Conor L.</p>
+    </section>
+    <section class="tier second" aria-labelledby="tier-2">
+      <h2 class="label" id="tier-2">2nd place</h2>
+      <p class="prize">Now You See Me on Broadway</p>
+      <p class="names">Calvin B.</p>
+    </section>
+    <section class="tier third" aria-labelledby="tier-3">
+      <h2 class="label" id="tier-3">3rd place</h2>
+      <p class="prize">Pottery class</p>
+      <p class="names">Zahra H.</p>
+    </section>
+  </div>
+
+  <p class="claim">Winners, find the host to claim your prize.</p>
+  <div class="grow"></div>
+  <div class="footer">Observe · Interrogate · Accuse</div>
+</main>
+
+</body>
+</html>
